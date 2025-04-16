@@ -4,8 +4,6 @@
 package jsonl
 
 import (
-	"bufio"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -64,30 +62,21 @@ func UnpackBundle(r io.Reader, fnOpts ...unpackoptFunc) error {
 		outDir = "."
 	}
 
-	scanner := bufio.NewScanner(r)
-	buf := make([]byte, 0, 64*1024)
-
-	// Increase the buf max value to 10 mb just in case
-	// we encounter huge lines
-	scanner.Buffer(buf, 1024*1024*10)
-
-	i := -1
-	for scanner.Scan() {
-		i++
-		data := scanner.Bytes()
-		var parsed any
-		if err := json.Unmarshal(data, &parsed); err != nil {
+	for i, rdr := range IterateBundle(r) {
+		if rdr == nil {
 			if opts.failOnInvalid {
 				return fmt.Errorf("invalid json document on line %d", i)
 			}
-			// If the setting is not on, just ignore the line
 			continue
 		}
-		if err := os.WriteFile(
-			filepath.Join(outDir, fmt.Sprintf("%s%02d.json", prefix, i)),
-			data, os.FileMode(0o644),
-		); err != nil {
-			return fmt.Errorf("writing document #%d: %w", i, err)
+		f, err := os.Create(filepath.Join(outDir, fmt.Sprintf("%s%02d.json", prefix, i)))
+		if err != nil {
+			return fmt.Errorf("creating file for document #%d: %w", i, err)
+		}
+		defer f.Close() //nolint:errcheck
+
+		if _, err := io.Copy(f, rdr); err != nil {
+			return fmt.Errorf("writing document #%d to disk: %w", i, err)
 		}
 	}
 	return nil
