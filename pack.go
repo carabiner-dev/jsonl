@@ -8,7 +8,7 @@ import (
 	"io"
 	"os"
 
-	"sigs.k8s.io/release-utils/util"
+	"sigs.k8s.io/release-utils/helpers"
 )
 
 // PackFilesToStream takes a writer and writes to it the flattened versions
@@ -27,7 +27,7 @@ func PackFilesToBundle(bundle string, paths []string) error {
 // of the JSON files passed in the paths
 func PackFilesToStream(w io.Writer, paths []string) error {
 	for _, path := range paths {
-		if util.IsDir(path) {
+		if helpers.IsDir(path) {
 			if err := FlattenJSONDirectoryToWriter(w, path); err != nil {
 				return err
 			}
