@@ -27,7 +27,7 @@ func TestIterartor(t *testing.T) {
 			t.Parallel()
 			data, err := os.Open(tc.bundle)
 			require.NoError(t, err)
-			defer data.Close()
+			defer data.Close() //nolint:errcheck
 			var c, e int
 			for i, r := range IterateBundle(data) {
 				c++
