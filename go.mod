@@ -3,7 +3,7 @@ module github.com/carabiner-dev/jsonl
 go 1.23.12
 
 require (
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.0
 	sigs.k8s.io/release-utils v0.12.1
 )
 
