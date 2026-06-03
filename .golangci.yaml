@@ -60,7 +60,7 @@ linters:
     - godox
     - goheader
     - gomoddirectives
-    - gomodguard
+    - gomodguard_v2
     - goprintffuncname
     - gosec
     - gosmopolitan
@@ -117,9 +117,6 @@ linters:
         - BUG
         - FIXME
         - HACK
-    gosec:
-      excludes:
-        - G304
     gosmopolitan:
       # Allow and ignore `time.Local` usages.
       #
@@ -171,6 +168,9 @@ linters:
         - typeUnparen
         - unnamedResult
         - unnecessaryBlock
+    gosec:
+      excludes:
+        - G304
     nolintlint:
       # Enable to ensure that nolint directives are all used. Default is true.
       allow-unused: false
