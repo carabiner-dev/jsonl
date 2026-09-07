@@ -13,7 +13,9 @@ import (
 	"strings"
 )
 
-// FlattenJSONDirectoryToWriter flattens all JSON files in a directory
+// FlattenJSONDirectoryToWriter flattens all the .json files at the top level
+// of a directory into w, one document per line. Subdirectories and files with
+// other extensions (jsonl files included) are ignored.
 func FlattenJSONDirectoryToWriter(w io.Writer, path string) error {
 	dirContents, err := os.ReadDir(path)
 	if err != nil {
@@ -29,16 +31,7 @@ func FlattenJSONDirectoryToWriter(w io.Writer, path string) error {
 			continue
 		}
 
-		f, err := os.Open(filepath.Join(path, entry.Name()))
-		if err != nil {
-			return fmt.Errorf("opening file: %w", err)
-		}
-		defer f.Close() //nolint:errcheck
-
-		if _, err := io.Copy(w, FlattenJSONStream(f)); err != nil {
-			return fmt.Errorf("writing stream")
-		}
-		if _, err := w.Write([]byte("\n")); err != nil {
+		if err := packFile(w, filepath.Join(path, entry.Name())); err != nil {
 			return err
 		}
 	}
